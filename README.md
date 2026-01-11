@@ -25,3 +25,12 @@ The game provides a mouse-based interactive UI where the user plays against the 
 - Learning graphics programming in C++
 - College mini-project
 - Game development basics
+
+## Screenshots
+
+### Main Menu
+![Main Menu](screenshots/menu.png)
+
+### Gameplay & Result
+![Gameplay Result](screenshots/play_result.png)
+
