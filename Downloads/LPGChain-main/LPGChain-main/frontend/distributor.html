@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributor Dashboard - LPGChain</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="navbar">
+  <h2>LPGChain</h2>
+  <div>
+    <a href="admin.html">Admin</a>
+    <a href="distributor.html">Distributor</a>
+    <a href="customer.html">Customer</a>
+    <a href="transactions.html">Transactions</a>
+    <a href="login.html">Logout</a>
+  </div>
+</div>
+  <div class="container">
+<h2>➕ Add New Distributor</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Total Stock Received</h3>
+        <p id="statStock">Loading...</p>
+      </div>
+      <div class="card">
+        <h3>Delivered</h3>
+        <p id="statDelivered">Loading...</p>
+      </div>
+      <div class="card">
+        <h3>Remaining Stock</h3>
+        <p id="statRemaining">Loading...</p>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Mark LPG Delivery</h2>
+      <input type="text" placeholder="Customer Name / ID">
+      <input type="number" placeholder="Number of Cylinders">
+      <button>Mark Delivered</button>
+    </div>
+    <div class="section">
+      <h2>Delivery Records</h2>
+      <table>
+        <tr>
+          <th>Customer</th>
+          <th>Quantity</th>
+          <th>Status</th>
+        </tr>
+        <tbody id="deliveryTableBody">
+          <tr><td colspan="3">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  const API = 'http://localhost:8080/api';
+
+  async function loadData() {
+    // Load deliveries
+    const deliveries = await fetch(`${API}/deliveries`).then(r => r.json());
+
+    // Stats
+    const total = deliveries.length;
+    const delivered = deliveries.filter(d => d.deliveryStatus === 'Delivered').length;
+    const remaining = total - delivered;
+
+    document.getElementById('statStock').textContent = total;
+    document.getElementById('statDelivered').textContent = delivered;
+    document.getElementById('statRemaining').textContent = remaining;
+
+    // Delivery table — show first 20
+    const tbody = document.getElementById('deliveryTableBody');
+    tbody.innerHTML = '';
+    deliveries.slice(0, 20).forEach(d => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${d.customerId}</td>
+        <td>${d.cylinderCount}</td>
+        <td>${d.deliveryStatus}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>

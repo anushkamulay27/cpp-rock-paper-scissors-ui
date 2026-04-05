@@ -1,0 +1,49 @@
+<script>
+    function handleRegister(event) {
+      event.preventDefault();
+
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      const name = document.getElementById("name").value;
+      const area = document.getElementById("area").value;
+
+      // Generate a simple customer ID for hackathon
+      const newCustomer = {
+        customerId: "CUST" + Date.now().toString().slice(-6),
+        name: name,
+        mobileNumber: document.getElementById("email").value,
+        address: area,
+        areaName: area,
+        cylinderType: "14.2kg",
+        subsidyStatus: "Active",
+        linkedDistributorId: "DIST001",
+        connectionNumber: "CON" + Date.now().toString().slice(-6),
+        areaId: "AREA001"
+      };
+
+      fetch("http://localhost:8080/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCustomer)
+      })
+      .then(r => r.json())
+      .then(() => {
+        alert("✅ Account created successfully! Please login.");
+        window.location.href = "login.html";
+      })
+      .catch(() => {
+        alert("❌ Registration failed. Please try again.");
+      });
+    }
+
+    function togglePassword(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.type = field.type === "password" ? "text" : "password";
+    }
+</script>

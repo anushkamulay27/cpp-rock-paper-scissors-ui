@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - LPGChain</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="navbar">
+  <h2>LPGChain</h2>
+  <div>
+    <a href="admin.html">Admin</a>
+    <a href="distributor.html">Distributor</a>
+    <a href="customer.html">Customer</a>
+    <a href="transactions.html">Transactions</a>
+    <a href="login.html">Logout</a>
+  </div>
+</div>
+  <div class="container">
+   <h1>Admin Dashboard</h1>
+<p style="color: gray; margin-bottom: 20px;">
+  Monitor LPG distribution, allocate stock, and detect fraud activity
+</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Total Distributors</h3>
+        <p id="statDistributors">Loading...</p>
+      </div>
+      <div class="card">
+        <h3>Total Cylinders</h3>
+        <p id="statCylinders">Loading...</p>
+      </div>
+      <div class="card">
+        <h3>Total Customers</h3>
+        <p id="statCustomers">Loading...</p>
+      </div>
+    </div>
+
+   <div class="section alert-box">
+  <h2>⚠️ Fraud Alert Detected</h2>
+  <p id="fraudAlert">Checking for mismatches...</p>
+</div>
+
+    <div class="section">
+      <h2>Add Distributor</h2>
+      <input type="text" placeholder="Distributor Name">
+      <input type="text" placeholder="Area">
+      <input type="text" placeholder="Contact Number">
+      <button>Add Distributor</button>
+    </div>
+
+    <div class="section">
+      <h2>Allocate LPG Stock</h2>
+      <select id="distributorSelect">
+        <option value="">Select Distributor</option>
+      </select>
+      <input type="number" placeholder="Number of Cylinders">
+      <button>Allocate Stock</button>
+    </div>
+
+    <div class="section">
+      <h2>Recent Transactions</h2>
+      <table>
+        <tr>
+          <th>Txn ID</th>
+          <th>Type</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Quantity</th>
+          <th>Time</th>
+        </tr>
+        <tbody id="txnTableBody">
+          <tr><td colspan="6">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  const API = 'http://localhost:8080/api';
+
+  async function loadData() {
+    // Load all data in parallel
+    const [distributors, cylinders, customers, transactions] = await Promise.all([
+      fetch(`${API}/distributors`).then(r => r.json()),
+      fetch(`${API}/cylinders`).then(r => r.json()),
+      fetch(`${API}/customers`).then(r => r.json()),
+      fetch(`${API}/transactions`).then(r => r.json()),
+    ]);
+
+    // Stat cards
+    document.getElementById('statDistributors').textContent = distributors.length;
+    document.getElementById('statCylinders').textContent = cylinders.length;
+    document.getElementById('statCustomers').textContent = customers.length;
+
+    // Fraud alert — flag any distributor with 0 cylinders received
+    const suspicious = distributors.filter(d => d.totalCylindersReceived === 0);
+    if (suspicious.length > 0) {
+      document.getElementById('fraudAlert').innerHTML =
+        `<strong>${suspicious[0].name}</strong> has received <strong>0 cylinders</strong> — possible mismatch.`;
+    } else {
+      document.getElementById('fraudAlert').textContent = 'No mismatches detected. All distributors look normal.';
+    }
+
+    // Distributor dropdown
+    const select = document.getElementById('distributorSelect');
+    distributors.forEach(d => {
+      const option = document.createElement('option');
+      option.value = d.distributorId;
+      option.textContent = `${d.name} — ${d.areaCovered}`;
+      select.appendChild(option);
+    });
+
+    // Recent transactions — show latest 10
+    const tbody = document.getElementById('txnTableBody');
+    tbody.innerHTML = '';
+    transactions.slice(0, 10).forEach(t => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${t.transactionId}</td>
+        <td>${t.transactionType}</td>
+        <td>${t.fromEntityId}</td>
+        <td>${t.toEntityId}</td>
+        <td>${t.cylinderCount}</td>
+        <td>${t.timestamp}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>

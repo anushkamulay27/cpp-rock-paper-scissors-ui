@@ -1,0 +1,55 @@
+<script>
+    function handleLogin(event) {
+      event.preventDefault();
+
+      const email = document.querySelector('input[type="email"]').value;
+      const role = document.getElementById("role").value;
+
+      if (!role) { alert("Please select a role"); return; }
+
+      // Admin — hardcoded for hackathon (no admin table in DB)
+      if (role === "admin") {
+        window.location.href = "admin.html";
+        return;
+      }
+
+      // Customer — check against DB
+      if (role === "customer") {
+        fetch("http://localhost:8080/api/customers")
+          .then(r => r.json())
+          .then(customers => {
+            const found = customers.find(c =>
+              c.mobileNumber === email || c.name.toLowerCase() === email.toLowerCase()
+            );
+            if (found) {
+              window.location.href = "customer.html";
+            } else {
+              alert("Customer not found. Please register first.");
+            }
+          });
+        return;
+      }
+
+      // Distributor — check against DB
+      if (role === "distributor") {
+        fetch("http://localhost:8080/api/distributors")
+          .then(r => r.json())
+          .then(distributors => {
+            const found = distributors.find(d =>
+              d.contactPhone === email || d.name.toLowerCase() === email.toLowerCase()
+            );
+            if (found) {
+              window.location.href = "distributor.html";
+            } else {
+              alert("Distributor not found in system.");
+            }
+          });
+        return;
+      }
+    }
+
+    function toggleLoginPassword() {
+      const passwordField = document.getElementById("loginPassword");
+      passwordField.type = passwordField.type === "password" ? "text" : "password";
+    }
+</script>
