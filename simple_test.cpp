@@ -2,6 +2,7 @@
 #include <iostream>
 using namespace std;
 
+
 int main() {
     int gd = DETECT, gm;
     
