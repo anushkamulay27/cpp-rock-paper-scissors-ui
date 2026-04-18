@@ -14,6 +14,7 @@ The game provides a mouse-based interactive UI where the user plays against the 
 - C++
 - WinBGIm Graphics Library
 - Mouse & Keyboard Events
+- C++ libraries 
 
 ## How It Works
 1. User selects Rock, Paper or Scissors by clicking buttons.
