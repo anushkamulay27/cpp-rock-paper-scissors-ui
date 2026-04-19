@@ -25,7 +25,8 @@ The game provides a mouse-based interactive UI where the user plays against the 
 ## Use Case
 - Learning graphics programming in C++
 - College mini-project
-- Game development basics
+- Game development basic
+- First project
 
 ## Screenshots
 
